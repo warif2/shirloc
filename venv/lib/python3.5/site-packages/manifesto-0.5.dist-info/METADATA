@@ -1,0 +1,21 @@
+Metadata-Version: 2.0
+Name: manifesto
+Version: 0.5
+Summary: Pluggable cache manifest for Django.
+Home-page: https://github.com/cyberdelia/manifesto
+Author: Timothee Peignier
+Author-email: timothee.peignier@tryphon.org
+License: UNKNOWN
+Platform: UNKNOWN
+Classifier: Development Status :: 4 - Beta
+Classifier: Environment :: Web Environment
+Classifier: Framework :: Django
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Topic :: Utilities
+
+UNKNOWN
+
+
