@@ -23,7 +23,9 @@ text = "---------------------------------------------------\n" \
        "@:{sample_#}:{sample_name}:{group}:{fraction}:{replicate}:{read1}:{read2}\n\n" \
        "# Specify all the comparisons to be performed.\n" \
        ">:control-experiment\n\n" \
-       "~ Analysis Parameters ~\n" \
+       "~ Kallisto Parameters ~\n" \
+       "# Skip kallisto alignment step?\n" \
+       "k:skip=no\n\n" \
        "# kallisto index path\n" \
        "k:index=\n\n" \
        "# kallisto quant settings\n" \

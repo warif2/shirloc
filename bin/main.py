@@ -72,6 +72,7 @@ if __name__ == '__main__':
         formatter = logging.Formatter('[%(asctime)s] %(message)s', datefmt='%y-%m-%d %H:%M:%S')
         console.setFormatter(formatter)
         logging.getLogger('').addHandler(console)
+        logger.info('Beginning analysis with sherlock ver=%s' % __version__)
 
         # Perform system check for necessary executables in PATH
         logger.debug('Performing system check to ensure necessary executables are installed.')
@@ -92,28 +93,35 @@ if __name__ == '__main__':
             logger.debug('Abort: Missing kallisto index')
             sys.exit()
 
-        # Run kallisto quant on all sample FASTQ files using desired parameters
-        for sample_num in metadata['samples'].keys():
+        # Run kallisto quant on all sample FASTQ files using desired parameters if needed
+        if metadata['parameters']['k']['skip'] == 'no':
+            for sample_num in metadata['samples'].keys():
 
-            # Read dictionary into object
-            sample_info = sherlock_classes.Sample_dict_read(metadata['samples'][sample_num])
+                # Read dictionary into object
+                sample_info = sherlock_classes.Sample_dict_read(metadata['samples'][sample_num])
 
-            # Create output folder for kallisto output
-            outf = args.o + 'kallisto_output/' + sample_info.id
-            if not os.path.exists(outf):
-                os.makedirs(outf)
-            open(outf + '/log.txt', 'a').close()
+                # Create output folder for kallisto output
+                outf = args.o + 'kallisto_output/' + sample_info.id
+                if not os.path.exists(outf):
+                    os.makedirs(outf)
+                open(outf + '/log.txt', 'a').close()
 
-            # Run kallisto quant on file
-            logger.info('Running kallisto quant on... sample: %s, fraction: %s, replicate: %s' % (sample_info.name,
-                                                                                                  sample_info.fraction,
-                                                                                                  sample_info.replicate))
+                # Run kallisto quant on file
+                logger.info('Running kallisto quant on... sample: %s, fraction: %s, replicate: %s' % (sample_info.name,
+                                                                                                      sample_info.fraction,
+                                                                                                      sample_info.replicate))
 
-            retcode = kallisto_wrapper.quant(metadata['parameters']['k'], kallisto_ind, outf, sample_info.kallisto_file_in)
+                retcode = kallisto_wrapper.quant(metadata['parameters']['k'], kallisto_ind, outf, sample_info.kallisto_file_in)
 
-            # Check if kallisto quant exited with error
-            if retcode != 0:
-                logger.info('Error: kallisto quant exited with code %i' % retcode)
-                sys.exit(1)
+                # Check if kallisto quant exited with error
+                if retcode != 0:
+                    logger.info('Error: kallisto quant exited with code %i' % retcode)
+                    sys.exit(1)
+
+        elif metadata['parameters']['k']['skip'] == 'yes':
+            logger.info('Skipping kallisto quant step on samples...')
+
+        else:
+            logger.info('Please provide valid options for "k:skip" in manifest.txt file.')
 
         # Perform comparisons using sleuth package
