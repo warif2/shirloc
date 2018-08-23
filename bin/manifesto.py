@@ -20,7 +20,7 @@ text = "---------------------------------------------------\n" \
        "e:seq_type=\n\n" \
        "# Sample information and path to FASTQ files. Refer to <link>\n" \
        "# for instructions filling this information.\n" \
-       "@:{sample_name}:{group}:{fraction}:{replicate}:{read1}:{read2}\n\n" \
+       "@:{sample_#}:{sample_name}:{group}:{fraction}:{replicate}:{read1}:{read2}\n\n" \
        "# Specify all the comparisons to be performed.\n" \
        ">:control-experiment\n\n" \
        "~ Analysis Parameters ~\n" \
@@ -76,10 +76,11 @@ def parse(path):
 
         # Store sample information into sample_dict
         if sample_info[0] == '@':
-            sample_dict[sample_info[1]] = {'group': sample_info[2], 'fraction': sample_info[3],
-                                           'replicate': sample_info[4], 'read1': sample_info[5].strip('\n')}
-            if len(sample_info) > 6:
-                sample_dict[sample_info[1]]['read2'] = sample_info[6].strip('\n')
+            sample_dict[sample_info[1]] = {'name': sample_info[2], 'group': sample_info[3],
+                                           'fraction': sample_info[4], 'replicate': sample_info[5],
+                                           'read1': sample_info[6].strip('\n')}
+            if len(sample_info) > 7:
+                sample_dict[sample_info[1]]['read2'] = sample_info[7].strip('\n')
             else:
                 sample_dict[sample_info[1]]['read2'] = 'na'
 

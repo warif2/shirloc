@@ -3,6 +3,7 @@ Contains methods which act as python wrappers for kallisto, a psuedoaligner for 
 """
 
 import os
+import logging
 
 
 def index():
@@ -10,8 +11,13 @@ def index():
 
 
 def quant(args, ind, outd, files):
+
+    # Setup logger
+    logger = logging.getLogger(__name__)
+
     # Base command for kallisto quant mode
     command = 'kallisto quant {options} -i {index} -o {output_dir} {fastq_files}'
+    log_info = ' > {output_dir}/log.txt 2>&1'
 
     # Initialize format dictionary, f
     f = dict(options='', index='', output_dir='', fastq_files='')
@@ -77,9 +83,12 @@ def quant(args, ind, outd, files):
     # Store fasta file path into format dictionary
     f['fastq_files'] = files
 
-    # Format command
-    print(command.format_map(f))
+    # Execute command
+    logger.debug('kallisto command: %s' % command.format_map(f))
+    retcode = os.system(command.format_map(f) + log_info.format_map(f))
 
+    # Return exit code of process
+    return retcode
 
 def setup():
     pass
