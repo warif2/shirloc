@@ -16,6 +16,7 @@ import argparse
 import manifesto
 import system_check
 import kallisto_wrapper
+import sherlock_classes
 from version import __version__
 
 if __name__ == '__main__':
@@ -49,7 +50,7 @@ if __name__ == '__main__':
     if args.x == 'run':
 
         # Creating sub-directories in output path
-        for folder in ['logs','kallisto_output']:
+        for folder in ['logs','kallisto_output','sleuth_output']:
             if not os.path.exists(args.o + '/' + folder):
                 os.makedirs(args.o + '/' + folder)
 
@@ -83,6 +84,36 @@ if __name__ == '__main__':
         # Check metadata for any inconsistencies before proceeding with analysis
         # TODO create method to check errors in manifest.txt
 
-        # Run kallisto on all sample FASTQ files using desired parameters
-        for samples in metadata['samples'].keys():
-            kallisto_wrapper.quant(metadata['parameters']['k'], 'index', args.o + 'kallisto_output', 'files')
+        # Check if kallisto index has been provided, if not create index using annotation file provided
+        # TODO create method to check index or generate
+        kallisto_ind = metadata['parameters']['k']['index']
+        if kallisto_ind == '':
+            logger.info('Please provide a kallisto index for the organism used in the study.')
+            logger.debug('Abort: Missing kallisto index')
+            sys.exit()
+
+        # Run kallisto quant on all sample FASTQ files using desired parameters
+        for sample_num in metadata['samples'].keys():
+
+            # Read dictionary into object
+            sample_info = sherlock_classes.Sample_dict_read(metadata['samples'][sample_num])
+
+            # Create output folder for kallisto output
+            outf = args.o + 'kallisto_output/' + sample_info.id
+            if not os.path.exists(outf):
+                os.makedirs(outf)
+            open(outf + '/log.txt', 'a').close()
+
+            # Run kallisto quant on file
+            logger.info('Running kallisto quant on... sample: %s, fraction: %s, replicate: %s' % (sample_info.name,
+                                                                                                  sample_info.fraction,
+                                                                                                  sample_info.replicate))
+
+            retcode = kallisto_wrapper.quant(metadata['parameters']['k'], kallisto_ind, outf, sample_info.kallisto_file_in)
+
+            # Check if kallisto quant exited with error
+            if retcode != 0:
+                logger.info('Error: kallisto quant exited with code %i' % retcode)
+                sys.exit(1)
+
+        # Perform comparisons using sleuth package
