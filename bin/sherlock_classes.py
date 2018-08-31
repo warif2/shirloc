@@ -64,4 +64,4 @@ class Sample_entry_read:
             self.kallisto_file_in = " ".join([entry['read1'], entry['read2']])
 
         # Unique identifier
-        self.id = "_".join([self.name, self.group, 'frac-' + str(self.fraction), 'rep-' + str(self.replicate]))
+        self.id = "_".join([self.name, self.group, 'frac-' + str(self.fraction), 'rep-' + str(self.replicate)])
