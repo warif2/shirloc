@@ -17,6 +17,7 @@ import manifesto
 import system_check
 import kallisto_wrapper
 import sherlock_classes
+import sherlock_methods
 from version import __version__
 
 if __name__ == '__main__':
@@ -98,7 +99,7 @@ if __name__ == '__main__':
             for sample_num in metadata['samples'].keys():
 
                 # Read dictionary into object
-                sample_info = sherlock_classes.Sample_dict_read(metadata['samples'][sample_num])
+                sample_info = sherlock_classes.Sample_entry_read(metadata['samples'][sample_num])
 
                 # Create output folder for kallisto output
                 outf = args.o + 'kallisto_output/' + sample_info.id
@@ -107,9 +108,7 @@ if __name__ == '__main__':
                 open(outf + '/log.txt', 'a').close()
 
                 # Run kallisto quant on file
-                logger.info('Running kallisto quant on... sample: %s, fraction: %s, replicate: %s' % (sample_info.name,
-                                                                                                      sample_info.fraction,
-                                                                                                      sample_info.replicate))
+                logger.info('Running kallisto quant on sample %i out of %i' % (sample_num, len(metadata['samples'])))
 
                 retcode = kallisto_wrapper.quant(metadata['parameters']['k'], kallisto_ind, outf, sample_info.kallisto_file_in)
 
@@ -125,3 +124,5 @@ if __name__ == '__main__':
             logger.info('Please provide valid options for "k:skip" in manifest.txt file.')
 
         # Perform comparisons using sleuth package
+        logger.info('Preparing directories and files for sleuth analysis.')
+        sherlock_methods.sleuth_setup(metadata['samples'],metadata['comparisons'],args.o + 'sleuth_output/')

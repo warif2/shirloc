@@ -93,7 +93,7 @@ def parse(path):
 
         # Store comparison info into comparison_array
         if sample_info[0] == '>':
-            comparison_array.append(sample_info[1])
+            comparison_array.append(sample_info[1].strip('\n'))
 
     metadata_dict = {'samples': sample_dict, 'parameters': parameter_dict, 'comparisons': comparison_array}
     logger.debug('Finished parsing manifest.txt.')
