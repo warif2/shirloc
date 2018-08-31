@@ -78,13 +78,13 @@ def parse(path):
 
         # Store sample information into sample_dict
         if sample_info[0] == '@':
-            sample_dict[sample_info[1]] = {'name': sample_info[2], 'group': sample_info[3],
-                                           'fraction': sample_info[4], 'replicate': sample_info[5],
+            sample_dict[int(sample_info[1])] = {'name': sample_info[2], 'group': sample_info[3],
+                                           'fraction': int(sample_info[4]), 'replicate': int(sample_info[5]),
                                            'read1': sample_info[6].strip('\n')}
             if len(sample_info) > 7:
-                sample_dict[sample_info[1]]['read2'] = sample_info[7].strip('\n')
+                sample_dict[int(sample_info[1])]['read2'] = sample_info[7].strip('\n')
             else:
-                sample_dict[sample_info[1]]['read2'] = 'na'
+                sample_dict[int(sample_info[1])]['read2'] = 'na'
 
         # Store parameters into metadata_dict
         if sample_info[0] in ['g', 'e', 'k']:
