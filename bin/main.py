@@ -10,6 +10,7 @@ import logging
 import os
 import sys
 import time
+import csv
 
 # Import bin modules
 import argparse
@@ -46,12 +47,14 @@ if __name__ == '__main__':
     if args.x == 'create_manifest':
         manifest = open(args.o + 'manifest.txt', 'w')
         manifest.write(manifesto.text)
+        samp_tbl = csv.writer(open(args.o + 'sample_table.csv', 'w'), delimiter = ',')
+        samp_tbl.writerow(manifesto.sample_table)
 
     # Run the analysis pipeline using parameters specified in 'manifest.txt'.
     if args.x == 'run':
 
         # Creating sub-directories in output path
-        for folder in ['logs','kallisto_output','sleuth_output']:
+        for folder in ['logs','kallisto_output','sleuth_output','sherlock_output']:
             if not os.path.exists(args.o + '/' + folder):
                 os.makedirs(args.o + '/' + folder)
 
@@ -61,10 +64,10 @@ if __name__ == '__main__':
             raise ValueError('Invalid log level: %s' % args.log)
         logging.basicConfig(filename=args.o + '/logs/log.bin.' + time_stamp + '.txt',
                             level=logging.DEBUG,
-                            format='%(asctime)s %(name)-12s %(message)s',
+                            format='%(asctime)s %(name)-12s \t %(message)s',
                             filemode='w')
         logger = logging.getLogger(__name__)
-        logger.debug('bin version: %s' % __version__)
+        logger.debug('sherlock version: %s' % __version__)
         logger.debug('Input command: ' + " ".join(sys.argv))
 
         # Defining Handler to write messages to sys.stdout
@@ -107,6 +110,9 @@ if __name__ == '__main__':
                     os.makedirs(outf)
                 open(outf + '/log.txt', 'a').close()
 
+                # Store kallisto output path into sample_dictionary
+                metadata['samples'][sample_num]['kallisto_outpath'] = outf
+
                 # Run kallisto quant on file
                 logger.info('Running kallisto quant on sample %i out of %i' % (sample_num, len(metadata['samples'])))
 
@@ -120,9 +126,43 @@ if __name__ == '__main__':
         elif metadata['parameters']['k']['skip'] == 'yes':
             logger.info('Skipping kallisto quant step on samples...')
 
+            # Store kallisto output path into sample_dictionary
+            for sample_num in metadata['samples'].keys():
+
+                # Read dictionary into object
+                sample_info = sherlock_classes.Sample_entry_read(metadata['samples'][sample_num])
+
+                # Check and store kallisto output path into sample_dictionary
+                outf = args.o + 'kallisto_output/' + sample_info.id
+                if not os.path.exists(outf):
+                    logger.info('Error: Expected directory of kallisto output for sample %i not found' % sample_num)
+                    sys.exit(2)
+                metadata['samples'][sample_num]['kallisto_outpath'] = args.o + 'kallisto_output/' + sample_info.id + '/'
+
         else:
             logger.info('Please provide valid options for "k:skip" in manifest.txt file.')
 
-        # Perform comparisons using sleuth package
+        # Preparing directories and sleuth metadata.txt files for sleuth analysis
+        # TODO Create a method to check for proper directories present in case of skip
         logger.info('Preparing directories and files for sleuth analysis.')
-        sherlock_methods.sleuth_setup(metadata['samples'],metadata['comparisons'],args.o + 'sleuth_output/')
+        sleuth_paths = sherlock_methods.sleuth_setup(metadata['samples'], args.o + 'sleuth_output/')
+
+        # Perform sleuth differential expression tests between fractions in each group
+        if metadata['parameters']['sl']['skip'] == 'no':
+            logger.info('Performing sleuth analysis within group fractions.')
+            sherlock_methods.sleuth_execute(sleuth_paths)
+            logger.debug('Sleuth analysis on all comparisons are complete.')
+
+        elif metadata['parameters']['sl']['skip'] == 'yes':
+            logger.info('Skipping sleuth analysis within group fractions...')
+
+        else:
+            logger.info('Please provide valid options for "sl:skip" in manifest.txt file.')
+
+        # Summarize sleuth results
+        logger.info('Consolidating sleuth analysis output.')
+        #sherlock_methods.sleuth_consolidate(args.o + 'sleuth_output/', sleuth_paths)
+
+        # Perform sherlock analysis
+        logger.info('Performing sherlock analysis to quantitate shifts of transcripts in polysomes.')
+        sherlock_methods.sherlock_compare(args.o, metadata['comparisons'])
