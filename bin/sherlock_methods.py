@@ -74,8 +74,9 @@ def sleuth_execute(paths):
     # Execute sleuth analysis for differential expression for each fractional comparison
     for comparison in paths:
         comp_info = comparison.split('/')
+        fraction = comp_info[-1].split('_vs_')
         logger.info('Running sleuth analysis on group: %s ; fraction: %s.' % (comp_info[-2],comp_info[-1]))
-        sleuth_stat = os.system('Rscript %s/sleuth_pipeline.R %s' % (variables.BIN_PATH,comparison))
+        sleuth_stat = os.system('Rscript %s/sleuth_pipeline.R %s %s %s' % (variables.BIN_PATH,comparison, fraction[0], fraction[1]))
 
         # Check R script exit status
         if sleuth_stat != 0:

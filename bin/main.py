@@ -161,7 +161,7 @@ if __name__ == '__main__':
 
         # Summarize sleuth results
         logger.info('Consolidating sleuth analysis output.')
-        #sherlock_methods.sleuth_consolidate(args.o + 'sleuth_output/', sleuth_paths)
+        sherlock_methods.sleuth_consolidate(args.o + 'sleuth_output/', sleuth_paths)
 
         # Perform sherlock analysis
         logger.info('Performing sherlock analysis to quantitate shifts of transcripts in polysomes.')
