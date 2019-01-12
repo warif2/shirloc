@@ -17,8 +17,8 @@ Image designed by [Faisal Mohammad](https://github.com/fossilM)
 # Download the latest release of shirloc using git
 git clone https://github.com/warif2/shirloc.git
 
-# Install necessary python packages needed by shirloc
-
+# Install python packages needed to run shirloc
+pip install -r /shirloc/requirements.txt
 ```
 
 ## QuickStart Guide
