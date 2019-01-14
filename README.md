@@ -26,7 +26,7 @@ pip install -r /shirloc/requirements.txt
 ## References
 Shirloc is an ongoing project and will continue to improve on the methodology. Here is the paper that describes the experimental methods to perform polysome fractionation and subsequent RNA-Seq. If you use Shirloc, please cite these papers in your work!
 
-**Cell-type specific polysome profiling from mammalian tissues**. Joe Seimetz, Waqar Arif, Sushant Bangru, Mikel Herneaz, Auinash Kalsotra. *Methods*, 2018, doi.org/10.1016/j.ymeth.2018.11.015.
+**Cell-type specific polysome profiling from mammalian tissues**. Joe Seimetz, Waqar Arif, Sushant Bangru, Mikel Herneaz, Auinash Kalsotra. *Methods*, 2018, [doi.org/10.1016/j.ymeth.2018.11.015](https://doi.org/10.1016/j.ymeth.2018.11.015).
 
 ## Support
 [shirloc google group](https://groups.google.com/d/forum/shirloc)
